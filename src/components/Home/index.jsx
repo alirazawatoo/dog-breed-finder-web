@@ -1,37 +1,29 @@
-import { PureComponent } from 'react'
-import { connect } from 'react-redux'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Divider } from 'antd'
 
 import Navbar from '../Navbar'
 import DogsContainer from '../../containers/DogsContainer'
-import { searchBreed } from '../../actions/searchBarActions'
-import * as actions from '../../actions/homeActions'
+import { getAllBreeds } from '../../actions/homeActions'
+import { getRandomDogs } from '../../actions/dogCardActions'
 
-class Home extends PureComponent {
+export default function Home() {
+    const dispatch = useDispatch()
+    const breedsStatus = useSelector(state => state.appReducer.breedsStatus)
+    const hasRandomDogs = useSelector(state => state.appReducer.randomDogs.length > 0)
 
-    componentDidMount = () => {
-        this.props.searchItem([])
-        this.props.getBreeds()
-    }
+    useEffect(() => {
+        if (breedsStatus === 'idle') dispatch(getAllBreeds())
+        if (!hasRandomDogs) dispatch(getRandomDogs())
+        // Only on first visit: later visits reuse what is already in the store.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
-    render() {
-        return (
-            <div className='app'>
-                <Navbar />
-                <Divider />
-                <DogsContainer />
-            </div>
-        )
-    }
+    return (
+        <div className='app'>
+            <Navbar />
+            <Divider />
+            <DogsContainer />
+        </div>
+    )
 }
-
-const mapDispatchToProps = dispatch => ({
-    getBreeds: () => {
-        dispatch(actions.getAllBreeds())
-    },
-    searchItem: (breed) => {
-        dispatch(searchBreed(breed))
-    },
-})
-
-export default connect(null, mapDispatchToProps)(Home)

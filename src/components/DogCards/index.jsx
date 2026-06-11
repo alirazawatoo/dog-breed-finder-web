@@ -1,76 +1,38 @@
-import { PureComponent } from 'react'
-import { Row, Col, Card, Pagination, Button } from 'antd'
+import { useState } from 'react'
+import { Row, Col, Card, Pagination } from 'antd'
 
+import { PAGE_SIZE } from '../../constants'
+import { formatDogName } from '../../lib/helper'
 import '../../stylesheets/app.css'
 
-class DogCards extends PureComponent {
-    state = {
-        minValue: 0,
-        maxValue: 12
-    }
+export default function DogCards({ dogs, renderAction }) {
+    const [page, setPage] = useState(1)
+    const lastPage = Math.max(1, Math.ceil(dogs.length / PAGE_SIZE))
+    const currentPage = Math.min(page, lastPage)
+    const visibleDogs = dogs.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
-    componentDidMount = () => {
-        this.props.getRandomDogsList()
-    }
-
-    handleChange = currentPage => {
-        this.setState({
-            minValue: currentPage * 12 - 12,
-            maxValue: currentPage * 12
-        })
-    }
-
-    render() {
-        const { randomBreedsData, searchedBreed, saveDog } = this.props
-        let collectedData = [].concat.apply([], Object.values(searchedBreed))
-        return (
-            <div className='main-container'>
-                <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} className='justified'>
-                    {(randomBreedsData && randomBreedsData[0] && randomBreedsData[0].breed !== undefined) ?
-                        Object.entries(randomBreedsData).slice(this.state.minValue, this.state.maxValue).map((item, index) => {
-                            return (
-                                <Col span={7} className='gutter-row col' key={index}>
-                                    <Card
-                                        cover={<img alt='' style={{ height: 300 }} src={item[1].image} />}
-                                        className='card-style'
-                                        actions={[
-                                            <Button type='link' onClick={() => saveDog(item[1])}>Save Dog &nbsp; ❤️</Button>
-                                        ]}
-                                    >
-                                        <Card.Meta title={item[1].subBreed ? `${item[1].breed}, ${item[1].subBreed}` : `${item[1].breed}`} />
-                                    </Card>
-                                </Col>
-                            )
-                        })
-                        :
-                        collectedData.slice(this.state.minValue, this.state.maxValue).map((item, index) => {
-                            return (
-                                <Col span={7} className='gutter-row col' key={index}>
-                                    <Card
-                                        cover={<img alt='' style={{ height: 300 }} src={item.image} />}
-                                        className='card-style'
-                                        actions={[
-                                            <Button type='link' onClick={() => saveDog(item)}>Save Dog &nbsp; ❤️</Button>
-                                        ]}
-                                    >
-                                        <Card.Meta title={item.subBreed ? `${item.breed}, ${item.subBreed}` : `${item.breed}`} />
-                                    </Card>
-                                </Col>
-                            )
-                        })
-                    }
-                </Row>
-                <Pagination
-                    defaultCurrent={1}
-                    defaultPageSize={12}
-                    pageSize={12}
-                    showSizeChanger={false}
-                    onChange={this.handleChange}
-                    total={collectedData.length > 0 ? collectedData.length : randomBreedsData.length}
-                />
-            </div>
-        )
-    }
+    return (
+        <div className='main-container'>
+            <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} className='justified'>
+                {visibleDogs.map(dog => (
+                    <Col span={7} className='gutter-row col' key={dog.image}>
+                        <Card
+                            cover={<img alt={formatDogName(dog)} style={{ height: 300 }} src={dog.image} />}
+                            className='card-style'
+                            actions={renderAction ? [renderAction(dog)] : undefined}
+                        >
+                            <Card.Meta title={formatDogName(dog)} />
+                        </Card>
+                    </Col>
+                ))}
+            </Row>
+            <Pagination
+                current={currentPage}
+                pageSize={PAGE_SIZE}
+                showSizeChanger={false}
+                onChange={setPage}
+                total={dogs.length}
+            />
+        </div>
+    )
 }
-
-export default DogCards

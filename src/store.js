@@ -5,17 +5,25 @@ import storage from 'redux-persist/es/storage'
 
 import rootReducer from './Reducers/index'
 
-const persistConfig = {
-    key: 'root',
-    storage: storage
+// Version 0 persisted the whole app state; only the saved dogs are worth keeping.
+export const migrateSavedState = state => {
+    if (!state || !state.appReducer) return Promise.resolve(state)
+    const { appReducer, _persist } = state
+    return Promise.resolve({ savedDogs: appReducer.savedDogs || [], _persist })
 }
 
-let middlewares = [thunk]
+const persistConfig = {
+    key: 'root',
+    version: 1,
+    storage,
+    whitelist: ['savedDogs'],
+    migrate: migrateSavedState
+}
 
-const persistedReducer = persistReducer(persistConfig, rootReducer)
+export const createAppStore = (reducer = rootReducer) => createStore(reducer, applyMiddleware(thunk))
 
 export default () => {
-    let store = createStore(persistedReducer, applyMiddleware(...middlewares))
-    let persistor = persistStore(store)
+    const store = createAppStore(persistReducer(persistConfig, rootReducer))
+    const persistor = persistStore(store)
     return { store, persistor }
 }

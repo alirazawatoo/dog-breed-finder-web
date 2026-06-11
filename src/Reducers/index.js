@@ -1,11 +1,8 @@
 import { combineReducers } from 'redux'
 
 import appReducer from './appReducer'
+import savedDogsReducer from './savedDogsReducer'
 
-const combinedReducer = combineReducers({ appReducer: appReducer })
-
-const rootReducer = (state, action) => {
-    return combinedReducer(state, action)
-}
+const rootReducer = combineReducers({ appReducer, savedDogs: savedDogsReducer })
 
 export default rootReducer

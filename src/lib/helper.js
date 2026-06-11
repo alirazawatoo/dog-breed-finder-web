@@ -1,24 +1,18 @@
 import { notification } from 'antd'
 
-export const mapBreedData = data => {
-    let mappedData = data.map((item) => {
-        if (item.split('/')[4].includes('-')) {
-            return {
-                image: item,
-                breed: (item.split('/')[4].split('-'))[0],
-                subBreed: ((item.split('/'))[4].split('-'))[1]
-            }
-        }
-        else {
-            return {
-                image: item,
-                breed: item.split('/')[4],
-                subBreed: ''
-            }
-        }
+const capitalize = word => word.charAt(0).toUpperCase() + word.slice(1)
+
+// Image URLs look like https://images.dog.ceo/breeds/hound-afghan/n02088094_1003.jpg;
+// the folder name is the only place the API tells us which breed a random image is.
+export const mapBreedData = (urls = []) =>
+    urls.map(image => {
+        const folder = new URL(image).pathname.split('/')[2] || ''
+        const [breed, ...rest] = folder.split('-')
+        return { image, breed, subBreed: rest.join('-') }
     })
-    return mappedData
-}
+
+export const formatDogName = ({ breed, subBreed }) =>
+    subBreed ? `${capitalize(subBreed)} ${breed}` : capitalize(breed)
 
 export const showNotification = (message, type, description) => {
     notification[type]({

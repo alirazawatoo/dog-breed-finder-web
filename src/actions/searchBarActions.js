@@ -1,38 +1,25 @@
 import * as appActionsConstants from '../constants'
 import * as dogService from '../lib/services/dogService'
+import { galleryRequest } from './galleryRequest'
+import { getRandomDogs } from './dogCardActions'
 
-export const getSearchedBreed = (breed, filtered = false) => {
-    return dispatch => {
-        dogService.getSearchedDog(breed).then((message) => {
-            if (filtered) {
-                dispatch({ type: appActionsConstants.GET_FILTERED_BREED_DATA, payload: message })
-            } else {
-                dispatch({ type: appActionsConstants.GET_SEARCHED_BREED_SUCCESS, payload: message })
-            }
-        }).catch((e) => {
-            console.error(e)
-        })
-    }
-}
+export const getBreedDogs = breed => dispatch =>
+    galleryRequest(
+        dispatch,
+        () => Promise.all([dogService.getSearchedDog(breed), dogService.getDogSubBreeds(breed)]),
+        ([images, subBreeds]) =>
+            dispatch({ type: appActionsConstants.GET_BREED_DOGS_SUCCESS, payload: { breed, images, subBreeds } })
+    )
 
-export const dogSubBreeds = (breed) => {
-    return dispatch => {
-        dogService.getDogSubBreeds(breed).then((message) => {
-            dispatch({ type: appActionsConstants.GET_SUB_BREEDS_SUCCESS, payload: { subBreeds: message, breed: breed } })
-        }).catch((e) => {
-            console.error(e)
-        })
-    }
-}
+// Receives the full new selection from the search box and fetches only breeds not loaded yet.
+export const updateSelectedBreeds = nextBreeds => (dispatch, getState) => {
+    const breeds = nextBreeds.slice(0, appActionsConstants.MAX_SELECTED_BREEDS)
+    const { dogsByBreed, randomDogs } = getState().appReducer
+    dispatch({ type: appActionsConstants.SET_SELECTED_BREEDS, payload: breeds })
 
-export const searchBreed = (breed) => {
-    return dispatch => {
-        dispatch({ type: appActionsConstants.SEARCH_BREED, payload: breed })
+    if (breeds.length === 0) {
+        return randomDogs.length === 0 ? dispatch(getRandomDogs()) : Promise.resolve()
     }
-}
-
-export const deselectBreed = (breed) => {
-    return dispatch => {
-        dispatch({ type: appActionsConstants.REMOVE_SEARCHED_BREED, payload: breed })
-    }
+    const missing = breeds.filter(breed => !dogsByBreed[breed])
+    return Promise.all(missing.map(breed => dispatch(getBreedDogs(breed))))
 }

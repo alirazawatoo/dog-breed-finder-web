@@ -1,102 +1,74 @@
 import * as appActionsConstants from '../constants'
 import { mapBreedData } from '../lib/helper'
 
-const initialState = {
+export const initialState = {
     allBreeds: {},
-    randomBreedsData: {},
-    searchedBreed: {},
+    breedsStatus: 'idle',
+    selectedBreeds: [],
+    dogsByBreed: {},
     subBreeds: {},
-    subBreedData: {},
-    selectedSearchedBreeds: [],
-    savedDogs: []
+    randomDogs: [],
+    filter: null,
+    filteredDogs: [],
+    pendingRequests: 0,
+    galleryError: null
 }
+
+const pickKeys = (object, keys) =>
+    Object.fromEntries(Object.entries(object).filter(([key]) => keys.includes(key)))
+
+const finishRequest = state => Math.max(0, state.pendingRequests - 1)
 
 const appReducer = (state = initialState, action) => {
     switch (action.type) {
         case appActionsConstants.GET_ALL_BREEDS:
-            return {
-                ...state,
-                allBreeds: {}
-            }
+            return { ...state, breedsStatus: 'loading' }
         case appActionsConstants.GET_ALL_BREEDS_SUCCESS:
-            return {
-                ...state,
-                allBreeds: action.payload
-            }
+            return { ...state, breedsStatus: 'succeeded', allBreeds: action.payload }
         case appActionsConstants.GET_ALL_BREEDS_ERROR:
+            return { ...state, breedsStatus: 'failed' }
+
+        case appActionsConstants.GALLERY_REQUEST:
+            return { ...state, pendingRequests: state.pendingRequests + 1, galleryError: null }
+        case appActionsConstants.GALLERY_ERROR:
+            return { ...state, pendingRequests: finishRequest(state), galleryError: action.payload }
+        case appActionsConstants.GET_RANDOM_DOGS_SUCCESS:
+            return { ...state, pendingRequests: finishRequest(state), randomDogs: mapBreedData(action.payload) }
+        case appActionsConstants.GET_BREED_DOGS_SUCCESS: {
+            const { breed, images, subBreeds } = action.payload
             return {
                 ...state,
-                allBreeds: {}
-            }
-        case appActionsConstants.GET_RANDOM_BREEDS:
-            return {
-                ...state,
-                randomBreedsData: {}
-            }
-        case appActionsConstants.GET_RANDOM_BREEDS_SUCCESS:
-            return {
-                ...state,
-                subBreeds: {},
-                randomBreedsData: mapBreedData(action.payload)
-            }
-        case appActionsConstants.GET_RANDOM_BREEDS_ERROR:
-            return {
-                ...state,
-                randomBreedsData: {}
-            }
-        case appActionsConstants.GET_SEARCHED_BREED:
-            return {
-                ...state,
-                searchedBreed: {}
-            }
-        case appActionsConstants.GET_SEARCHED_BREED_SUCCESS: {
-            const dog = mapBreedData(action.payload)
-            return {
-                ...state,
-                randomBreedsData: {},
-                searchedBreed: { ...state.searchedBreed, [dog[0].breed]: dog }
+                pendingRequests: finishRequest(state),
+                dogsByBreed: { ...state.dogsByBreed, [breed]: mapBreedData(images) },
+                subBreeds: { ...state.subBreeds, [breed]: subBreeds }
             }
         }
-        case appActionsConstants.GET_SEARCHED_BREED_ERROR:
+        case appActionsConstants.GET_SUB_BREED_DOGS_SUCCESS: {
+            const { breed, subBreed, images } = action.payload
+            const stillWanted = state.filter && state.filter.breed === breed && state.filter.subBreed === subBreed
             return {
                 ...state,
-                searchedBreed: {}
-            }
-        case appActionsConstants.GET_SUB_BREEDS_SUCCESS:
-            return {
-                ...state,
-                subBreeds: { ...state.subBreeds, [action.payload.breed]: action.payload.subBreeds }
-            }
-        case appActionsConstants.GET_SUB_BREED_DATA_SUCCESS: {
-            const subDog = mapBreedData(action.payload)
-            return {
-                ...state,
-                randomBreedsData: {},
-                searchedBreed: { [subDog[0].breed]: subDog }
+                pendingRequests: finishRequest(state),
+                filteredDogs: stillWanted ? mapBreedData(images) : state.filteredDogs
             }
         }
-        case appActionsConstants.SEARCH_BREED:
+
+        case appActionsConstants.SET_SELECTED_BREEDS: {
+            const selectedBreeds = action.payload
+            const filterStillValid = state.filter && selectedBreeds.includes(state.filter.breed)
             return {
                 ...state,
-                selectedSearchedBreeds: action.payload
+                selectedBreeds,
+                dogsByBreed: pickKeys(state.dogsByBreed, selectedBreeds),
+                subBreeds: pickKeys(state.subBreeds, selectedBreeds),
+                filter: filterStillValid ? state.filter : null,
+                filteredDogs: filterStillValid ? state.filteredDogs : [],
+                galleryError: null
             }
-        case appActionsConstants.REMOVE_SEARCHED_BREED:
-            delete state.searchedBreed[action.payload]
-            return {
-                ...state,
-                searchedBreed: state.searchedBreed
-            }
-        case appActionsConstants.SAVE_DOG:
-            return {
-                ...state,
-                savedDogs: [...state.savedDogs, action.payload]
-            }
-        case appActionsConstants.GET_FILTERED_BREED_DATA:
-            return {
-                ...state,
-                randomBreedsData: {},
-                searchedBreed: mapBreedData(action.payload)
-            }
+        }
+        case appActionsConstants.SET_FILTER:
+            return { ...state, filter: action.payload, filteredDogs: [] }
+
         default:
             return state
     }
