@@ -1,7 +1,6 @@
 import { PureComponent } from 'react'
 import { Row, Col } from 'antd'
 import { connect } from 'react-redux'
-import findIndex from 'lodash/findIndex'
 
 import DogCards from '../../components/DogCards'
 import SearchBar from '../../components/SearchBar'
@@ -59,8 +58,7 @@ class DogsContainer extends PureComponent {
     saveDog = dog => {
         const { savedDogs, addToMySaveDogs } = this.props
         const description = 'This dog is saved and you can see them in My Saved Dogs page.'
-        let found = findIndex(savedDogs, (savedDog) => { return savedDog.image === dog.image })
-        if (found >= 0) {
+        if (savedDogs.some(savedDog => savedDog.image === dog.image)) {
             return showNotification('Dog already saved!', 'error', description)
         }
         addToMySaveDogs(dog)

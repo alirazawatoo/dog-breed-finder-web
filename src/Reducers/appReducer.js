@@ -1,5 +1,3 @@
-import { merge, concat } from 'lodash'
-
 import * as appActionsConstants from '../constants'
 import { mapBreedData } from '../lib/helper'
 
@@ -56,7 +54,7 @@ const appReducer = (state = initialState, action) => {
             return {
                 ...state,
                 randomBreedsData: {},
-                searchedBreed: merge({}, state.searchedBreed, { [dog[0].breed]: dog })
+                searchedBreed: { ...state.searchedBreed, [dog[0].breed]: dog }
             }
         }
         case appActionsConstants.GET_SEARCHED_BREED_ERROR:
@@ -67,7 +65,7 @@ const appReducer = (state = initialState, action) => {
         case appActionsConstants.GET_SUB_BREEDS_SUCCESS:
             return {
                 ...state,
-                subBreeds: merge({}, state.subBreeds, { [action.payload.breed]: action.payload.subBreeds })
+                subBreeds: { ...state.subBreeds, [action.payload.breed]: action.payload.subBreeds }
             }
         case appActionsConstants.GET_SUB_BREED_DATA_SUCCESS: {
             const subDog = mapBreedData(action.payload)
@@ -91,7 +89,7 @@ const appReducer = (state = initialState, action) => {
         case appActionsConstants.SAVE_DOG:
             return {
                 ...state,
-                savedDogs: concat(state.savedDogs, action.payload)
+                savedDogs: [...state.savedDogs, action.payload]
             }
         case appActionsConstants.GET_FILTERED_BREED_DATA:
             return {

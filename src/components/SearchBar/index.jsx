@@ -12,7 +12,7 @@ export default props => {
           <Select
             mode='multiple'
             showSearch
-            showArrow={false}
+            suffix={null}
             placeholder='Search any breed'
             value={selectedSearchedBreeds}
             onChange={handleChange}
@@ -31,7 +31,7 @@ export default props => {
         <Col span={0} />
         <Col className='gutter-row' span={2}>
           <Button
-            type='danger'
+            danger
             shape='round'
             onClick={() => handleClear()}
           >
