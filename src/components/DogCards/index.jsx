@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import { PureComponent } from 'react'
 import { Row, Col, Card, Pagination, Button } from 'antd'
 
 import '../../stylesheets/app.css'

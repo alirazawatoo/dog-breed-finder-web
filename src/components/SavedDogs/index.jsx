@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { Row, Col, Card, Pagination, Divider } from 'antd'
 
@@ -65,6 +65,4 @@ const mapStateToProps = state => {
     }
 }
 
-const mapDispatchToProps = dispatch => { return }
-
-export default connect(mapStateToProps, mapDispatchToProps)(SavedDogs)
+export default connect(mapStateToProps)(SavedDogs)

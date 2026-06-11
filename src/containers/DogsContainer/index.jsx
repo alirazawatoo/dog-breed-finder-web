@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import { PureComponent } from 'react'
 import { Row, Col } from 'antd'
 import { connect } from 'react-redux'
 import findIndex from 'lodash/findIndex'

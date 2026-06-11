@@ -3,11 +3,11 @@ import * as dogService from '../lib/services/dogService'
 
 export const getSearchedBreed = (breed, filtered = false) => {
     return dispatch => {
-        dogService.getSearchedDog(breed).then((response) => {
+        dogService.getSearchedDog(breed).then((message) => {
             if (filtered) {
-                dispatch({ type: appActionsConstants.GET_FILTERED_BREED_DATA, payload: response.data.message })
+                dispatch({ type: appActionsConstants.GET_FILTERED_BREED_DATA, payload: message })
             } else {
-                dispatch({ type: appActionsConstants.GET_SEARCHED_BREED_SUCCESS, payload: response.data.message })
+                dispatch({ type: appActionsConstants.GET_SEARCHED_BREED_SUCCESS, payload: message })
             }
         }).catch((e) => {
             console.error(e)
@@ -17,8 +17,8 @@ export const getSearchedBreed = (breed, filtered = false) => {
 
 export const dogSubBreeds = (breed) => {
     return dispatch => {
-        dogService.getDogSubBreeds(breed).then((response) => {
-            dispatch({ type: appActionsConstants.GET_SUB_BREEDS_SUCCESS, payload: { subBreeds: response.data.message, breed: breed } })
+        dogService.getDogSubBreeds(breed).then((message) => {
+            dispatch({ type: appActionsConstants.GET_SUB_BREEDS_SUCCESS, payload: { subBreeds: message, breed: breed } })
         }).catch((e) => {
             console.error(e)
         })

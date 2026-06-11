@@ -1,4 +1,3 @@
-import React from 'react'
 import { Select, Button, Row, Col } from 'antd'
 
 import '../../stylesheets/app.css'

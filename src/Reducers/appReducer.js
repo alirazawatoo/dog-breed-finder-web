@@ -36,12 +36,10 @@ const appReducer = (state = initialState, action) => {
                 randomBreedsData: {}
             }
         case appActionsConstants.GET_RANDOM_BREEDS_SUCCESS:
-            let data = {}
-            data = mapBreedData(action.payload)
             return {
                 ...state,
                 subBreeds: {},
-                randomBreedsData: data
+                randomBreedsData: mapBreedData(action.payload)
             }
         case appActionsConstants.GET_RANDOM_BREEDS_ERROR:
             return {
@@ -53,14 +51,14 @@ const appReducer = (state = initialState, action) => {
                 ...state,
                 searchedBreed: {}
             }
-        case appActionsConstants.GET_SEARCHED_BREED_SUCCESS:
-            let dog = {}
-            dog = mapBreedData(action.payload)
+        case appActionsConstants.GET_SEARCHED_BREED_SUCCESS: {
+            const dog = mapBreedData(action.payload)
             return {
                 ...state,
                 randomBreedsData: {},
                 searchedBreed: merge({}, state.searchedBreed, { [dog[0].breed]: dog })
             }
+        }
         case appActionsConstants.GET_SEARCHED_BREED_ERROR:
             return {
                 ...state,
@@ -71,18 +69,18 @@ const appReducer = (state = initialState, action) => {
                 ...state,
                 subBreeds: merge({}, state.subBreeds, { [action.payload.breed]: action.payload.subBreeds })
             }
-        case appActionsConstants.GET_SUB_BREED_DATA_SUCCESS:
-            let subDog = {}
-            subDog = mapBreedData(action.payload)
+        case appActionsConstants.GET_SUB_BREED_DATA_SUCCESS: {
+            const subDog = mapBreedData(action.payload)
             return {
                 ...state,
                 randomBreedsData: {},
                 searchedBreed: { [subDog[0].breed]: subDog }
             }
+        }
         case appActionsConstants.SEARCH_BREED:
             return {
                 ...state,
-                selectedSearchedBreeds: action.payload === [] ? [] : action.payload
+                selectedSearchedBreeds: action.payload
             }
         case appActionsConstants.REMOVE_SEARCHED_BREED:
             delete state.searchedBreed[action.payload]
@@ -96,12 +94,10 @@ const appReducer = (state = initialState, action) => {
                 savedDogs: concat(state.savedDogs, action.payload)
             }
         case appActionsConstants.GET_FILTERED_BREED_DATA:
-            let filtered_dog = {}
-            filtered_dog = mapBreedData(action.payload)
             return {
                 ...state,
                 randomBreedsData: {},
-                searchedBreed: filtered_dog
+                searchedBreed: mapBreedData(action.payload)
             }
         default:
             return state

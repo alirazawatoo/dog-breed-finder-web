@@ -1,21 +1,11 @@
-import baseService from './baseService.js'
+import { getMessage } from './baseService.js'
 
-export const getAllBreedList = () => {
-    return baseService.get('/breeds/list/all')
-}
+export const getAllBreedList = () => getMessage('/breeds/list/all')
 
-export const getRandomDogsList = () => {
-    return baseService.get('/breeds/image/random/50')
-}
+export const getRandomDogsList = () => getMessage('/breeds/image/random/50')
 
-export const getSearchedDog = breed => (
-    baseService.get(`/breed/${breed}/images/random/50`)
-)
+export const getSearchedDog = breed => getMessage(`/breed/${breed}/images/random/50`)
 
-export const getDogSubBreeds = breed => {
-    return baseService.get(`/breed/${breed}/list`)
-}
+export const getDogSubBreeds = breed => getMessage(`/breed/${breed}/list`)
 
-export const getSubBreedDogData = (breed, subBreed) => {
-    return baseService.get(`/breed/${breed}/${subBreed}/images/random/50`)
-}
+export const getSubBreedDogData = (breed, subBreed) => getMessage(`/breed/${breed}/${subBreed}/images/random/50`)
