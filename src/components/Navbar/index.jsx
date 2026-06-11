@@ -1,28 +1,37 @@
-import { Row, Col, Button } from 'antd'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+
+const PawMark = () => (
+    <svg className='brand__mark' viewBox='0 0 64 64' aria-hidden='true' focusable='false'>
+        <rect width='64' height='64' rx='14' />
+        <g className='brand__paw'>
+            <ellipse cx='32' cy='41' rx='12' ry='10' />
+            <ellipse cx='18' cy='27' rx='5' ry='6.5' />
+            <ellipse cx='46' cy='27' rx='5' ry='6.5' />
+            <ellipse cx='26' cy='17' rx='4.5' ry='6' />
+            <ellipse cx='38' cy='17' rx='4.5' ry='6' />
+        </g>
+    </svg>
+)
 
 export default function Navbar() {
+    const savedCount = useSelector(state => state.savedDogs.length)
     return (
-        <div>
-            <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-                <Col className="gutter-row" span={18}>
-                    <div><h1>Doggo Search</h1></div>
-                </Col>
-                <Col className="gutter-row" span={3}>
-                    <div>
-                        <Button type="link" size='large' className="search-btn">
-                            <Link to='/'>Search</Link>
-                        </Button>
-                    </div>
-                </Col>
-                <Col className="gutter-row" span={3}>
-                    <div>
-                        <Button type="link" size='large'>
-                            <Link to='/saved-dogs'>My saved dogs</Link>
-                        </Button>
-                    </div>
-                </Col>
-            </Row>
-        </div>
+        <header className='site-header'>
+            <a className='skip-link' href='#main'>Skip to content</a>
+            <div className='site-header__inner'>
+                <Link to='/' className='brand'>
+                    <PawMark />
+                    <span className='brand__name'>Doggo Search</span>
+                </Link>
+                <nav aria-label='Main' className='site-nav'>
+                    <NavLink to='/' end>Search</NavLink>
+                    <NavLink to='/saved-dogs'>
+                        Saved dogs <span className='badge' aria-hidden='true'>{savedCount}</span>
+                        <span className='visually-hidden'>({savedCount} saved)</span>
+                    </NavLink>
+                </nav>
+            </div>
+        </header>
     )
 }

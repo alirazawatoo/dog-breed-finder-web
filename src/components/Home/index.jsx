@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Divider } from 'antd'
 
 import Navbar from '../Navbar'
 import DogsContainer from '../../containers/DogsContainer'
@@ -20,10 +19,11 @@ export default function Home() {
     }, [])
 
     return (
-        <div className='app'>
+        <>
             <Navbar />
-            <Divider />
-            <DogsContainer />
-        </div>
+            <main id='main' className='page'>
+                <DogsContainer />
+            </main>
+        </>
     )
 }

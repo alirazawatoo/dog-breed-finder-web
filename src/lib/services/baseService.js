@@ -4,7 +4,7 @@ const BASE_URL = 'https://dog.ceo/api'
 export const getMessage = async (path) => {
     const response = await fetch(`${BASE_URL}${path}`)
     if (!response.ok) {
-        throw new Error(`Dog CEO request failed (${response.status}) for ${path}`)
+        throw new Error(`HTTP ${response.status}`)
     }
     const body = await response.json()
     return body.message

@@ -16,6 +16,13 @@ window.matchMedia = window.matchMedia || ((query) => ({
   dispatchEvent: () => false,
 }))
 
+// antd's Select measures its tags with ResizeObserver, also missing from jsdom.
+window.ResizeObserver = window.ResizeObserver || class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+}
+
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
 afterEach(() => {
   cleanup()

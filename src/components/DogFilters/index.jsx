@@ -1,31 +1,47 @@
-import { Button } from 'antd'
+import { capitalize, formatDogName } from '../../lib/helper'
 
-import '../../stylesheets/app.css'
+export default function DogFilters({ selectedBreeds, subBreeds, filter, onFilter, onReset }) {
+    const isActive = (breed, subBreed = null) =>
+        Boolean(filter) && filter.breed === breed && (filter.subBreed || null) === subBreed
 
-export default function DogFilters({ selectedBreeds, subBreeds, onFilter, onReset }) {
     return (
-        <div className='main-container'>
-            <h2>Filters</h2>
-            <ul>
-                <li>
-                    <Button type='link' size='large' onClick={onReset}>All</Button>
-                </li>
-                {selectedBreeds.map(breed => (
-                    <li key={breed}>
-                        <Button type='link' size='large' onClick={() => onFilter(breed)}>{breed}</Button>
-                        {(subBreeds[breed] || []).length > 0 && (
-                            <ul>
-                                {subBreeds[breed].map(subBreed => (
-                                    <li key={subBreed}>
-                                        <Button type='link' size='small' onClick={() => onFilter(breed, subBreed)}>{subBreed}</Button>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
+        <section className='filters' aria-labelledby='filters-heading'>
+            <h2 id='filters-heading' className='panel-heading'>Narrow down</h2>
+            {selectedBreeds.length === 0 ? (
+                <p className='muted'>Pick a breed above, then narrow the photos to one breed or sub-breed here.</p>
+            ) : (
+                <ul className='filter-list'>
+                    <li>
+                        <button type='button' className='chip' aria-pressed={!filter} onClick={onReset}>
+                            All selected breeds
+                        </button>
                     </li>
-                ))}
-            </ul>
-            {selectedBreeds.length === 0 && <p>Please search any breed having sub-breed to use filters.</p>}
-        </div>
+                    {selectedBreeds.map(breed => (
+                        <li key={breed}>
+                            <button type='button' className='chip' aria-pressed={isActive(breed)} onClick={() => onFilter(breed)}>
+                                {capitalize(breed)}
+                            </button>
+                            {(subBreeds[breed] || []).length > 0 && (
+                                <ul className='filter-list filter-list--sub' aria-label={`${capitalize(breed)} sub-breeds`}>
+                                    {subBreeds[breed].map(subBreed => (
+                                        <li key={subBreed}>
+                                            <button
+                                                type='button'
+                                                className='chip chip--small'
+                                                aria-pressed={isActive(breed, subBreed)}
+                                                aria-label={formatDogName({ breed, subBreed })}
+                                                onClick={() => onFilter(breed, subBreed)}
+                                            >
+                                                {capitalize(subBreed)}
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </section>
     )
 }
