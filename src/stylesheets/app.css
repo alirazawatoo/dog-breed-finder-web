@@ -1,0 +1,25 @@
+.app {
+  padding: 1rem;
+}
+
+.main-container {
+  background-color: rgb(24 144 255 / 13%);
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.justified {
+  justify-content: space-around;
+}
+
+.card-style {
+  border-radius: 7px !important;
+}
+
+.col {
+  padding: 20px;
+}
+
+.search-btn {
+  float: right;
+}
